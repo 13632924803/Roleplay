@@ -83,7 +83,7 @@ function MemorySuggestionModal({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+      <div className="theme-modal-overlay absolute inset-0" onClick={onClose} />
       <div className="neo-panel relative mx-4 flex max-h-[80vh] w-full max-w-2xl flex-col p-5">
         <div className="mb-3 flex items-center justify-between">
           <div>
@@ -102,13 +102,13 @@ function MemorySuggestionModal({
                   type="text"
                   value={draft.title}
                   onChange={(event) => onChange(index, { title: event.target.value })}
-                  className="rounded-input border border-surface-200 bg-white px-3 py-1.5 text-sm"
+                  className="rounded-input border border-surface-200 bg-surface-0/70 px-3 py-1.5 text-sm"
                   placeholder="记忆标题"
                 />
                 <select
                   value={draft.memory_type}
                   onChange={(event) => onChange(index, { memory_type: event.target.value as MemorySuggestionDraft["memory_type"] })}
-                  className="rounded-input border border-surface-200 bg-white px-3 py-1.5 text-sm"
+                  className="rounded-input border border-surface-200 bg-surface-0/70 px-3 py-1.5 text-sm"
                 >
                   <option value="event">剧情事件</option>
                   <option value="relationship">角色关系</option>
@@ -124,14 +124,14 @@ function MemorySuggestionModal({
                   max={100}
                   value={draft.salience}
                   onChange={(event) => onChange(index, { salience: Number(event.target.value) })}
-                  className="rounded-input border border-surface-200 bg-white px-3 py-1.5 text-sm"
+                  className="rounded-input border border-surface-200 bg-surface-0/70 px-3 py-1.5 text-sm"
                 />
               </div>
               <textarea
                 value={draft.content}
                 onChange={(event) => onChange(index, { content: event.target.value })}
                 rows={3}
-                className="w-full rounded-input border border-surface-200 bg-white px-3 py-2 text-sm"
+                className="w-full rounded-input border border-surface-200 bg-surface-0/70 px-3 py-2 text-sm"
                 placeholder="记忆内容"
               />
               <p className="mt-1 text-xs text-ink-300">提炼理由：{draft.reason || "模型未提供"}</p>
@@ -635,8 +635,8 @@ export function ChatRoomPage() {
 
   if (isMobile) {
     return (
-      <div className="mobile-bottom-nav-spacer flex h-dvh flex-col bg-surface-50 md:pb-0">
-        <div className="flex items-center gap-2 border-b border-surface-100 bg-white px-3 py-2.5">
+        <div className="mobile-bottom-nav-spacer flex h-dvh flex-col bg-surface-50 md:pb-0">
+        <div className="theme-nav-shell flex items-center gap-2 rounded-none border-x-0 border-t-0 px-3 py-2.5">
           <button type="button" onClick={handleMobileSessionTrigger} className="flex items-center gap-1.5 rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-600 transition-colors hover:bg-brand-100">
             <Drama className="h-4 w-4" />
             <span>{chat.activeSessionId ? "会话" : "选择角色"}</span>
@@ -656,8 +656,8 @@ export function ChatRoomPage() {
         </div>
 
         {showMobileSessions && (
-          <div className="absolute left-0 top-0 z-[60] flex h-dvh w-72 flex-col bg-white shadow-modal">
-            <div className="flex items-center justify-between border-b p-3">
+          <div className="theme-page-shell absolute left-0 top-0 z-[60] flex h-dvh w-72 flex-col rounded-none border-y-0 border-l-0">
+            <div className="flex items-center justify-between border-b p-3" style={{ borderColor: "var(--border-soft)" }}>
               <span className="text-sm font-medium">会话</span>
               <button type="button" onClick={() => setShowMobileSessions(false)} className="btn-ghost p-1 text-xs">关闭</button>
             </div>
@@ -677,7 +677,7 @@ export function ChatRoomPage() {
                 loading={false}
               />
             </div>
-            <div className="border-t p-3 space-y-2">
+            <div className="space-y-2 border-t p-3" style={{ borderColor: "var(--border-soft)" }}>
               <button
                 type="button"
                 onClick={() => {
@@ -705,14 +705,14 @@ export function ChatRoomPage() {
           <>
             {/* Backdrop */}
             <div
-              className="absolute inset-0 z-20 bg-black/20 backdrop-blur-sm"
+              className="theme-modal-overlay absolute inset-0 z-20"
               onClick={() => setShowMobileContext(false)}
             />
             {/* Bottom sheet */}
-            <div className="absolute inset-x-0 bottom-0 z-30 flex h-[88dvh] flex-col rounded-t-[24px] bg-gradient-to-b from-white to-sky-50/40 shadow-modal">
+            <div className="theme-page-shell absolute inset-x-0 bottom-0 z-30 flex h-[88dvh] flex-col rounded-t-[24px] rounded-b-none">
               {/* Drag handle */}
               <div className="flex justify-center pt-3 pb-1">
-                <div className="h-1 w-10 rounded-full bg-slate-300" />
+                <div className="h-1 w-10 rounded-full bg-surface-200" />
               </div>
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-3">
@@ -722,7 +722,7 @@ export function ChatRoomPage() {
                 </div>
                 <button 
                   onClick={() => setShowMobileContext(false)} 
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-100 text-ink-400 transition-colors hover:bg-surface-200 hover:text-ink-600"
+                  className="neo-button flex h-9 w-9 items-center justify-center rounded-full text-ink-400 hover:text-ink-600"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -745,7 +745,7 @@ export function ChatRoomPage() {
         </div>
 
         {chat.error && (
-          <div className="flex items-center gap-2 border-t border-rose-200 bg-rose-light/80 px-3 py-2">
+          <div className="theme-status-danger flex items-center gap-2 border-t px-3 py-2">
             <AlertTriangle className="h-4 w-4 flex-shrink-0 text-rose-500" />
             <p className="flex-1 truncate text-xs text-rose-700">{chat.error}</p>
             <button type="button" onClick={() => void chat.retry()} className="btn-ghost flex items-center gap-1 text-xs text-rose-600">
@@ -756,7 +756,7 @@ export function ChatRoomPage() {
         )}
 
         {!chat.isDemo && !chat.apiConfigured && (
-          <div className="flex items-center gap-2 border-t border-amber-200 bg-amber-light px-3 py-2">
+          <div className="theme-status-warning flex items-center gap-2 border-t px-3 py-2">
             <WifiOff className="h-4 w-4 flex-shrink-0 text-amber-500" />
             <p className="flex-1 text-xs text-amber-700">请先配置 API Key</p>
             <Link to="/settings" className="btn-ghost text-xs text-amber-700">
@@ -767,12 +767,12 @@ export function ChatRoomPage() {
         )}
 
         {editingIndex !== null && (
-          <div className="flex items-center gap-2 border-t bg-brand-50 px-3 py-2">
+          <div className="theme-section-accent flex items-center gap-2 border-t px-3 py-2">
             <input
               type="text"
               value={editText}
               onChange={(event) => setEditText(event.target.value)}
-              className="flex-1 rounded-input border border-brand-200 bg-white px-3 py-1.5 text-sm"
+              className="flex-1 rounded-input border border-brand-200 bg-surface-0/70 px-3 py-1.5 text-sm"
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
                   void chat.editAndResend(editingIndex, editText);
@@ -819,15 +819,15 @@ export function ChatRoomPage() {
   }
 
   return (
-    <div className="flex h-full gap-3 bg-gradient-to-br from-sky-50 via-white to-blue-50 p-3">
-      <div className={`scrollbar-none flex-shrink-0 overflow-y-auto neo-surface transition-all duration-200 ${sessionsCollapsed ? "w-16" : "w-64"}`}
+    <div className="flex h-full gap-3 p-3">
+      <div className={`theme-sidebar-shell scrollbar-none flex-shrink-0 overflow-y-auto transition-all duration-200 ${sessionsCollapsed ? "w-16" : "w-64"}`}
         style={{ borderRadius: '24px' }}
       >
         {sessionsCollapsed ? (
           <div className="flex h-full flex-col items-center py-3">
             <button
               onClick={handleCreateSession}
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-50 to-sky-50 text-brand-500 shadow-sm transition-colors hover:from-brand-100 hover:to-sky-100"
+              className="neo-button-pressed flex h-9 w-9 items-center justify-center rounded-xl text-brand-500 shadow-sm transition-colors"
               title="新建会话"
             >
               <Plus className="h-4 w-4" />
@@ -839,8 +839,8 @@ export function ChatRoomPage() {
                   onClick={() => void chat.selectSession(session.id)}
                   className={`mt-1.5 flex h-9 w-9 items-center justify-center rounded-xl transition-colors ${
                     session.id === chat.activeSessionId
-                      ? "bg-gradient-to-br from-brand-50 to-sky-50 text-brand-600 shadow-sm"
-                      : "text-ink-400 hover:bg-sky-50/50 hover:text-ink-600"
+                      ? "neo-button-pressed text-brand-600 shadow-sm"
+                      : "text-ink-400 hover:bg-surface-100/60 hover:text-ink-600"
                   }`}
                   title={session.title}
                 >
@@ -856,8 +856,8 @@ export function ChatRoomPage() {
           </div>
         ) : (
           <div className="flex h-full flex-col">
-            <div className="flex items-center justify-between border-b border-sky-100/60 px-3 py-2.5">
-              <span className="text-xs font-semibold uppercase tracking-wide text-sky-500">会话列表</span>
+            <div className="flex items-center justify-between border-b px-3 py-2.5" style={{ borderColor: "var(--border-soft)" }}>
+              <span className="text-xs font-semibold uppercase tracking-wide text-brand-500">会话列表</span>
               <SidebarCollapseButton collapsed={sessionsCollapsed} onToggle={toggleSessionsCollapsed} side="left" />
             </div>
             <div className="flex-1 overflow-y-auto">
@@ -876,7 +876,7 @@ export function ChatRoomPage() {
 
       <div className="flex min-w-0 flex-1 flex-col justify-center">
         <div className="neo-page-shell mx-auto flex h-full w-full max-w-[1120px] flex-col overflow-hidden rounded-[34px]">
-          <div className="flex items-center gap-3 border-b border-white/50 bg-white/64 px-5 py-3">
+          <div className="theme-nav-shell flex items-center gap-3 rounded-none border-x-0 border-t-0 px-5 py-3">
           <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-brand-50 text-sm text-brand-500">
             {chat.activeCharacter?.avatar_emoji || <Drama className="h-4 w-4" />}
           </div>
@@ -907,7 +907,7 @@ export function ChatRoomPage() {
         </div>
 
         {chat.error && (
-          <div className="flex items-center gap-2 border-t bg-rose-light/80 px-4 py-2">
+          <div className="theme-status-danger flex items-center gap-2 border-t px-4 py-2">
             <AlertTriangle className="h-4 w-4 text-rose-500" />
             <p className="flex-1 truncate text-xs text-rose-700">{chat.error}</p>
             <button onClick={() => void chat.retry()} className="btn-ghost text-xs text-rose-600">
@@ -918,7 +918,7 @@ export function ChatRoomPage() {
         )}
 
         {!chat.isDemo && !chat.apiConfigured && (
-          <div className="flex items-center gap-2 border-t bg-amber-light px-4 py-2">
+          <div className="theme-status-warning flex items-center gap-2 border-t px-4 py-2">
             <WifiOff className="h-4 w-4 text-amber-500" />
             <p className="flex-1 text-xs text-amber-700">请先在设置中心启用 API 配置</p>
             <Link to="/settings" className="btn-ghost text-xs text-amber-700">
@@ -929,12 +929,12 @@ export function ChatRoomPage() {
         )}
 
         {editingIndex !== null && (
-          <div className="flex items-center gap-2 border-t bg-brand-50 px-4 py-2">
+          <div className="theme-section-accent flex items-center gap-2 border-t px-4 py-2">
             <input
               type="text"
               value={editText}
               onChange={(event) => setEditText(event.target.value)}
-              className="flex-1 rounded-input border border-brand-200 bg-white px-3 py-1.5 text-sm"
+              className="flex-1 rounded-input border border-brand-200 bg-surface-0/70 px-3 py-1.5 text-sm"
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
                   void chat.editAndResend(editingIndex, editText);
@@ -949,7 +949,7 @@ export function ChatRoomPage() {
           </div>
         )}
 
-        <div className="border-t border-white/50 bg-white/68 px-5 py-4">
+        <div className="theme-nav-shell rounded-none border-x-0 border-b-0 px-5 py-4">
           <div className="mx-auto max-w-4xl">
             <ChatInput
               value={inputValue}
@@ -965,7 +965,7 @@ export function ChatRoomPage() {
       </div>
     </div>
 
-      <div className={`scrollbar-none flex-shrink-0 overflow-y-auto neo-surface transition-all duration-200 ${contextCollapsed ? "w-12" : "w-80"}`}
+      <div className={`theme-sidebar-shell scrollbar-none flex-shrink-0 overflow-y-auto transition-all duration-200 ${contextCollapsed ? "w-12" : "w-80"}`}
         style={{ borderRadius: '24px' }}
       >
         {contextCollapsed ? (
@@ -980,7 +980,7 @@ export function ChatRoomPage() {
           </div>
         ) : (
           <div className="flex h-full flex-col">
-            <div className="flex items-center justify-between border-b border-sky-100/60 px-3 py-2.5">
+            <div className="flex items-center justify-between border-b px-3 py-2.5" style={{ borderColor: "var(--border-soft)" }}>
               <div>
                 <span className="text-xs font-semibold text-ink-700">上下文</span>
                 <p className="text-[10px] text-ink-400">角色设定与上下文控制台</p>

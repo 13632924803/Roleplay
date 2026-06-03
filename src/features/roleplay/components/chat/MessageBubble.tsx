@@ -102,8 +102,8 @@ export function MessageBubble({
       <div
         className={`relative max-w-[82%] px-4 py-3 ${
           isUser
-            ? "rounded-[24px] rounded-br-lg bg-gradient-to-br from-brand-500 to-sky-500 text-white shadow-[0_16px_36px_rgba(96,165,250,0.24)]"
-            : "neo-panel-soft rounded-[24px] rounded-bl-lg"
+            ? "theme-chat-user rounded-[24px] rounded-br-lg"
+            : "theme-chat-ai rounded-[24px] rounded-bl-lg"
         }`}
       >
         <p className={`mb-0.5 text-xs ${isUser ? "text-brand-100" : "text-ink-300"}`}>
@@ -204,7 +204,7 @@ export function MessageBubble({
             {mobileMenuOpen && (
               <div
                 ref={menuRef}
-                className={`absolute z-40 mt-1 w-44 rounded-2xl border border-white/70 bg-white/88 py-1.5 shadow-elevated backdrop-blur-md md:hidden ${
+                className={`theme-panel absolute z-40 mt-1 w-44 rounded-2xl py-1.5 md:hidden ${
                   isUser ? "right-0" : "left-0"
                 }`}
                 style={{ top: "100%" }}

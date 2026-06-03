@@ -79,7 +79,7 @@ export function MemoryEditor({ memory, types, onSave, onClose }: MemoryEditorPro
         <p className="mt-1 text-xs text-ink-300">数值越高越优先注入，Token 紧张时低重要度可能被跳过。</p>
       </div>
 
-      <div className="mobile-modal-safe-footer sticky bottom-0 z-10 -mx-1 mt-6 flex gap-2 rounded-[24px] border border-white/55 bg-white/82 px-1 py-2 backdrop-blur-xl">
+      <div className="theme-editor-footer mobile-modal-safe-footer sticky bottom-0 z-10 -mx-1 mt-6 flex gap-2 rounded-[24px] px-1 py-2">
         <button
           type="button"
           onClick={handleSave}

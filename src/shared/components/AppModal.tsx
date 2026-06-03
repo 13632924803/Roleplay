@@ -67,20 +67,20 @@ export function AppModal({
     <div className="fixed inset-0 z-[100] flex items-center justify-center px-3 py-3 md:px-8 md:py-10">
       {/* Overlay */}
       <div 
-        className="absolute inset-0 z-[100] bg-[radial-gradient(circle_at_center,_rgba(191,219,254,0.22),_rgba(255,255,255,0.08)_52%,_rgba(255,255,255,0.02)_100%)] backdrop-blur-sm fade-in"
+        className="theme-modal-overlay absolute inset-0 z-[100] fade-in"
         onClick={closeOnOverlayClick ? onClose : undefined}
       />
       
       {/* Modal */}
       <div
-        className={`neo-panel relative z-[110] my-auto flex w-[calc(100vw-24px)] flex-col self-center overflow-hidden rounded-[30px] border border-white/80 bg-white/74 shadow-[0_30px_90px_rgba(96,165,250,0.20)] backdrop-blur-xl modal-enter md:w-full md:rounded-[36px] ${sizeClasses[size]} ${bodyClassName}`}
+        className={`theme-modal-shell relative z-[110] my-auto flex w-[calc(100vw-24px)] flex-col self-center overflow-hidden rounded-[30px] modal-enter md:w-full md:rounded-[36px] ${sizeClasses[size]} ${bodyClassName}`}
         style={{
           maxHeight: "calc(100dvh - 24px)",
         }}
       >
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/22 via-white/10 to-sky-100/18" />
+        <div className="pointer-events-none absolute inset-0 opacity-80" style={{ background: "var(--surface-section-accent)" }} />
         {/* Header */}
-        <div className="relative z-[120] flex flex-shrink-0 items-start justify-between border-b border-white/45 bg-white/56 px-5 py-4 backdrop-blur-sm md:px-6 md:py-5">
+        <div className="theme-modal-header relative z-[120] flex flex-shrink-0 items-start justify-between px-5 py-4 md:px-6 md:py-5">
           <div>
             <h2 className="text-lg font-semibold text-ink-900">{title}</h2>
             {description && (
@@ -90,7 +90,7 @@ export function AppModal({
           <button
             type="button"
             onClick={onClose}
-            className="neo-button flex h-9 w-9 items-center justify-center rounded-full text-ink-500 transition-all duration-[280ms] hover:text-brand-600 active:scale-[0.98]"
+            className="theme-card-subtle flex h-9 w-9 shrink-0 items-center justify-center rounded-full p-0 text-ink-600 transition-all duration-[280ms] hover:-translate-y-0.5 hover:text-brand-600 active:translate-y-0"
           >
             <X className="h-5 w-5" />
           </button>
@@ -103,7 +103,7 @@ export function AppModal({
 
         {/* Footer */}
         {footer && (
-          <div className="mobile-modal-safe-footer relative z-[120] sticky bottom-0 flex-shrink-0 rounded-b-[30px] border-t border-white/45 bg-white/82 px-4 py-3 backdrop-blur-sm md:rounded-b-[36px] md:px-6 md:py-4">
+          <div className="theme-modal-footer mobile-modal-safe-footer relative z-[120] sticky bottom-0 flex-shrink-0 rounded-b-[30px] px-4 py-3 md:rounded-b-[36px] md:px-6 md:py-4">
             {footer}
           </div>
         )}

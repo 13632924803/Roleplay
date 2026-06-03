@@ -26,7 +26,7 @@ export function OfflineStatusBanner() {
   return (
     <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-sm w-full mx-4">
       <div 
-        className="neo-surface p-3 flex items-center gap-3"
+        className="theme-page-shell flex items-center gap-3 p-3"
         style={{ borderRadius: '16px' }}
       >
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-500">

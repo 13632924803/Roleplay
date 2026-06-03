@@ -10,19 +10,19 @@ interface FeatureCardProps {
 }
 
 const colorMap = {
-  amber: { bg: "bg-amber-50", text: "text-amber-500", hover: "hover:border-amber-200" },
-  sky: { bg: "bg-sky-50", text: "text-sky-500", hover: "hover:border-sky-200" },
-  emerald: { bg: "bg-emerald-50", text: "text-emerald-500", hover: "hover:border-emerald-200" },
-  brand: { bg: "bg-brand-50", text: "text-brand-500", hover: "hover:border-brand-200" },
-  rose: { bg: "bg-rose-50", text: "text-rose-500", hover: "hover:border-rose-200" },
-  violet: { bg: "bg-violet-50", text: "text-violet-500", hover: "hover:border-violet-200" },
+  amber: { bg: "theme-status-warning", text: "text-amber-500", hover: "hover:border-amber-200" },
+  sky: { bg: "theme-status-info", text: "text-sky-500", hover: "hover:border-sky-200" },
+  emerald: { bg: "theme-status-success", text: "text-emerald-500", hover: "hover:border-emerald-200" },
+  brand: { bg: "theme-status-brand", text: "text-brand-500", hover: "hover:border-brand-200" },
+  rose: { bg: "theme-status-danger", text: "text-rose-500", hover: "hover:border-rose-200" },
+  violet: { bg: "theme-status-brand", text: "text-brand-600", hover: "hover:border-brand-300" },
 };
 
 export function FeatureCard({ icon, title, description, to, color = "amber" }: FeatureCardProps) {
   const c = colorMap[color];
   const content = (
     <div className="flex flex-col items-center p-4 text-center">
-      <div className={`mb-2 flex h-10 w-10 items-center justify-center rounded-xl ${c.bg} ${c.text}`}>
+      <div className={`mb-2 flex h-10 w-10 items-center justify-center rounded-xl border ${c.bg} ${c.text}`}>
         {icon}
       </div>
       <span className="text-sm font-medium text-ink-700">{title}</span>
@@ -39,7 +39,7 @@ export function FeatureCard({ icon, title, description, to, color = "amber" }: F
   }
 
   return (
-    <div className="rounded-2xl border border-surface-100 bg-white shadow-sm">
+    <div className="theme-card-subtle rounded-2xl">
       {content}
     </div>
   );

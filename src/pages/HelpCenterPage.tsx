@@ -158,9 +158,9 @@ export function HelpCenterPage() {
 
   return (
     <div className="relative max-w-full overflow-x-hidden">
-      <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-gradient-to-br from-sky-200/50 to-blue-200/30 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-gradient-to-tr from-blue-200/40 to-sky-100/30 blur-3xl" />
-      <div className="pointer-events-none absolute right-1/4 top-1/3 h-48 w-48 rounded-full bg-gradient-to-br from-indigo-100/30 to-purple-100/20 blur-2xl" />
+      <div className="theme-orb-1 -right-24 -top-24 h-96 w-96" />
+      <div className="theme-orb-2 -bottom-32 -left-32 h-80 w-80" />
+      <div className="theme-orb-3 right-1/4 top-1/3 h-48 w-48" />
 
       <div className="page-container-wide relative max-w-full px-4 py-6 sm:px-5 md:px-8 md:py-10">
         <header className="mb-6 max-w-full md:mb-8">

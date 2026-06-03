@@ -21,17 +21,17 @@ export function PageSection({
   className = "",
 }: PageSectionProps) {
   const variantStyles = {
-    default: "border-surface-100 bg-white",
-    warm: "border-amber-100 bg-amber-light/10",
-    info: "border-sky-100 bg-sky-50/30",
-    highlight: "border-brand-100 bg-brand-50/20",
+    default: "theme-card-subtle",
+    warm: "theme-card-subtle theme-status-warning",
+    info: "theme-card-subtle theme-status-info",
+    highlight: "theme-card-subtle theme-status-brand",
   };
 
   return (
-    <section className={`rounded-2xl border p-5 shadow-sm ${variantStyles[variant]} ${className}`}>
+    <section className={`rounded-2xl p-5 ${variantStyles[variant]} ${className}`}>
       <div className="mb-3 flex items-center gap-2">
         {icon && (
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-50 text-brand-500">
+          <div className="theme-card-subtle flex h-8 w-8 items-center justify-center rounded-lg text-brand-500">
             {icon}
           </div>
         )}

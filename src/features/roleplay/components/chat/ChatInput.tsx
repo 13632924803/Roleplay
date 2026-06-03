@@ -39,7 +39,7 @@ export function ChatInput({
   }
 
   return (
-    <div className="flex items-end gap-3 rounded-[28px] border border-white/60 bg-white/58 p-3 backdrop-blur-md">
+    <div className="theme-input-shell flex items-end gap-3 rounded-[28px] p-3">
       <textarea
         ref={inputRef}
         value={value}

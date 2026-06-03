@@ -53,7 +53,7 @@ function WbNameModal({
         placeholder="描述（可选）"
         className="neo-input w-full rounded-input px-3 py-2.5 text-sm"
       />
-      <div className="mobile-modal-safe-footer sticky bottom-0 z-10 -mx-1 mt-6 flex gap-2 rounded-[24px] border border-white/55 bg-white/82 px-1 py-2 backdrop-blur-xl">
+      <div className="theme-editor-footer mobile-modal-safe-footer sticky bottom-0 z-10 -mx-1 mt-6 flex gap-2 rounded-[24px] px-1 py-2">
         <button
           type="button"
           onClick={() => {
@@ -116,7 +116,7 @@ export function StudioPage() {
           <ModeBadge />
         </div>
 
-        <div className="scrollbar-none mb-6 flex gap-2 overflow-x-auto rounded-[24px] border border-white/65 bg-white/42 p-2 backdrop-blur-sm">
+        <div className="theme-nav-shell scrollbar-none mb-6 flex gap-2 overflow-x-auto rounded-[24px] p-2">
           {tabs.map(({ key, label, icon, count }) => (
             <button
               key={key}
@@ -127,7 +127,7 @@ export function StudioPage() {
             >
               {icon}
               {label}
-              <span className="neo-pill bg-surface-100 px-1.5 py-0.5 text-xs text-ink-500">{count}</span>
+              <span className="neo-pill px-1.5 py-0.5 text-xs text-ink-500">{count}</span>
             </button>
           ))}
         </div>

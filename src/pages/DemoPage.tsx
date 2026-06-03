@@ -45,9 +45,9 @@ export function DemoPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 md:py-12">
-      <div className="card mb-8 border-amber-200 bg-amber-light/30">
+      <div className="theme-status-warning card mb-8 border">
         <div className="mb-3 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+          <div className="theme-status-warning flex h-10 w-10 items-center justify-center rounded-full border text-amber-600">
             <Eye className="h-5 w-5" />
           </div>
           <div>
@@ -55,18 +55,18 @@ export function DemoPage() {
               <h1 className="text-xl font-bold text-ink-900">网页本地预览</h1>
               <ModeBadge />
             </div>
-            <p className="text-sm text-ink-400">这里用于预览聊天界面与交互感受，不会消耗真实 API。</p>
+            <p className="text-sm text-ink-400">这里只用于预览聊天界面与交互感受，不会消耗真实 API。</p>
           </div>
         </div>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           {[
-            { icon: <Zap className="h-4 w-4" />, label: "本地预览回复", sub: "不消耗真实 API" },
-            { icon: <Shield className="h-4 w-4" />, label: "当前仅做界面预览", sub: "不会展示托管密钥明文" },
-            { icon: <Cloud className="h-4 w-4" />, label: "登录后可开启同步", sub: "本地模式不是强制注册门槛" },
-          ].map(({ icon, label, sub }) => (
-            <div key={label} className="rounded-card bg-white/70 p-3 text-center">
-              <span className="text-amber-500">{icon}</span>
+            { icon: <Zap className="h-4 w-4" />, label: "本地预览回复", sub: "不消耗真实 API", tone: "text-amber-500" },
+            { icon: <Shield className="h-4 w-4" />, label: "只做界面预览", sub: "不会展示托管密钥明文", tone: "text-emerald-500" },
+            { icon: <Cloud className="h-4 w-4" />, label: "登录后可开同步", sub: "本地模式不是强制注册门槛", tone: "text-sky-500" },
+          ].map(({ icon, label, sub, tone }) => (
+            <div key={label} className="theme-card-subtle rounded-card p-3 text-center">
+              <span className={tone}>{icon}</span>
               <p className="mt-1 text-xs font-medium text-ink-700">{label}</p>
               <p className="text-xs text-ink-400">{sub}</p>
             </div>
@@ -93,16 +93,16 @@ export function DemoPage() {
                 key={`${message.role}-${index}`}
                 className={`max-w-[85%] rounded-card p-3 ${
                   message.role === "user"
-                    ? "ml-auto bg-brand-50 text-right"
-                    : "border border-surface-100 bg-surface-50"
+                    ? "theme-chat-user ml-auto text-right"
+                    : "theme-chat-ai border"
                 }`}
               >
                 <p className="mb-0.5 text-xs text-ink-300">{message.role === "user" ? "你" : "本地预览"}</p>
-                <p className="whitespace-pre-wrap text-sm leading-relaxed text-ink-700">{message.content}</p>
+                <p className="whitespace-pre-wrap text-sm leading-relaxed text-inherit">{message.content}</p>
               </div>
             ))}
             {mockLoading ? (
-              <div className="max-w-[85%] rounded-card border border-surface-100 bg-surface-50 p-3">
+              <div className="theme-chat-ai max-w-[85%] rounded-card border p-3">
                 <p className="text-xs text-ink-300">本地预览正在生成...</p>
               </div>
             ) : null}
@@ -116,7 +116,7 @@ export function DemoPage() {
             onChange={(event) => setMockInput(event.target.value)}
             onKeyDown={(event) => event.key === "Enter" && void handleMockSend()}
             placeholder="输入任意内容预览本地回复..."
-            className="flex-1 rounded-input border border-surface-200 bg-surface-50 px-3 py-2 text-sm text-ink-900 placeholder:text-ink-300 focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+            className="neo-input flex-1 rounded-input px-3 py-2 text-sm"
           />
           <button
             onClick={() => void handleMockSend()}

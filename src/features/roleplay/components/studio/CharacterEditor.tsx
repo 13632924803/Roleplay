@@ -182,7 +182,7 @@ export function CharacterEditor({ character, onSave, onClose }: CharacterEditorP
         {tags.length > 0 ? (
           <div className="mt-2 flex flex-wrap gap-1.5">
             {tags.map((tag) => (
-              <span key={tag} className="neo-pill inline-flex items-center gap-1 bg-brand-50/70 text-xs text-brand-600">
+              <span key={tag} className="neo-pill theme-pill-brand inline-flex items-center gap-1 text-xs">
                 {tag}
                 <button type="button" onClick={() => setTags(tags.filter((item) => item !== tag))} className="p-0.5 hover:text-rose-500">
                   <Trash2 className="h-2.5 w-2.5" />
@@ -209,7 +209,7 @@ export function CharacterEditor({ character, onSave, onClose }: CharacterEditorP
         </div>
       ) : null}
 
-      <div className="mobile-modal-safe-footer sticky bottom-0 z-10 -mx-1 mt-6 flex gap-2 rounded-[24px] border border-white/55 bg-white/82 px-1 py-2 backdrop-blur-xl">
+      <div className="theme-editor-footer mobile-modal-safe-footer sticky bottom-0 z-10 -mx-1 mt-6 flex gap-2 rounded-[24px] px-1 py-2">
         <button
           type="button"
           onClick={handleSave}

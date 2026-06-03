@@ -42,10 +42,10 @@ export function LandingPage() {
   return (
     <div className="relative overflow-hidden">
       {/* Background decorations */}
-      <div className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-gradient-to-br from-sky-200/50 to-blue-200/30 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-gradient-to-tr from-blue-200/40 to-sky-100/30 blur-3xl" />
-      <div className="pointer-events-none absolute top-1/2 left-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-indigo-100/30 to-purple-100/20 blur-2xl" />
-      <div className="pointer-events-none absolute top-1/4 right-1/4 h-48 w-48 rounded-full bg-gradient-to-br from-sky-100/40 to-blue-50/30 blur-2xl" />
+      <div className="theme-orb-1 -right-24 -top-24 h-96 w-96" />
+      <div className="theme-orb-2 -bottom-32 -left-32 h-80 w-80" />
+      <div className="theme-orb-3 left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2" />
+      <div className="theme-orb-4 right-1/4 top-1/4 h-48 w-48" />
       
       <div className="page-container relative px-7 py-8 md:px-10 md:py-10">
 

@@ -20,6 +20,7 @@ import type {
   SyncSummary,
 } from "../types/sync";
 import type {
+  BranchRow,
   CharacterRow,
   MemoryRow,
   MessageRevisionRow,
@@ -399,14 +400,61 @@ async function uploadEntityType(
     }
 
     case "branches": {
-      // Branches are created per-session; upload via ensureDefaultBranch
+      // Map each local branch to a concrete cloud branch ID before message upload.
       const sessions = await LocalRepo.listSessions().catch(() => [] as SessionRow[]);
       for (const session of sessions) {
         try {
           const cloudSessionId = idMap.get(session.id) ?? session.id;
-          const branch = await Repo.ensureDefaultBranch(supabase!, cloudSessionId, userId).catch(() => null);
-          if (branch) { result.created++; }
-          else result.skipped++;
+          const localBranches = await LocalRepo.listBranches(session.id).catch(() => [] as BranchRow[]);
+          const cloudBranches = await Repo.listBranches(supabase!, cloudSessionId).catch(() => [] as BranchRow[]);
+
+          for (const localBranch of localBranches) {
+            const mappedParentId = localBranch.parent_branch_id
+              ? idMap.get(localBranch.parent_branch_id) ?? null
+              : null;
+            const existingBranch =
+              cloudBranches.find((branch) => branch.id === localBranch.id)
+              ?? cloudBranches.find(
+                (branch) =>
+                  branch.name === localBranch.name &&
+                  (branch.title ?? null) === (localBranch.title ?? null) &&
+                  (branch.parent_branch_id ?? null) === mappedParentId,
+              )
+              ?? null;
+
+            if (existingBranch) {
+              result.skipped++;
+              idMap.set(localBranch.id, existingBranch.id);
+              continue;
+            }
+
+            const createdBranch = await Repo.createBranch(supabase!, userId, {
+              session_id: cloudSessionId,
+              name: localBranch.name,
+              title: localBranch.title ?? localBranch.name,
+              parent_branch_id: mappedParentId ?? undefined,
+              forked_from_message_id: localBranch.forked_from_message_id
+                ? idMap.get(localBranch.forked_from_message_id) ?? undefined
+                : undefined,
+            }).catch(() => null);
+
+            if (createdBranch) {
+              result.created++;
+              idMap.set(localBranch.id, createdBranch.id);
+              cloudBranches.push(createdBranch);
+            } else {
+              result.failed++;
+            }
+          }
+
+          if (localBranches.length === 0) {
+            const defaultBranch = await Repo.ensureDefaultBranch(supabase!, cloudSessionId, userId).catch(() => null);
+            if (defaultBranch) {
+              result.created++;
+            } else {
+              result.skipped++;
+            }
+          }
         } catch { result.failed++; }
       }
       break;
@@ -435,7 +483,15 @@ async function uploadEntityType(
           const cloudSessionId = idMap.get(session.id) ?? session.id;
           const msgs = await LocalRepo.listMessages(session.id).catch(() => [] as MessageRow[]);
           for (const msg of msgs) {
-            const cleaned = { ...stripSensitiveFields(msg), user_id: userId, session_id: cloudSessionId, character_id: msg.character_id ? (idMap.get(msg.character_id) ?? msg.character_id) : null };
+            const cleaned = {
+              ...stripSensitiveFields(msg),
+              user_id: userId,
+              session_id: cloudSessionId,
+              branch_id: idMap.get(msg.branch_id) ?? msg.branch_id,
+              character_id: msg.character_id ? (idMap.get(msg.character_id) ?? msg.character_id) : null,
+              parent_id: msg.parent_id ? (idMap.get(msg.parent_id) ?? null) : null,
+              edited_from_id: msg.edited_from_id ? (idMap.get(msg.edited_from_id) ?? null) : null,
+            };
             const cloudExisting = await Repo.createMessage(supabase!, userId, {
               session_id: cleaned.session_id,
               branch_id: cleaned.branch_id,
@@ -465,12 +521,16 @@ async function uploadEntityType(
             const revs = await LocalRepo.loadMessageRevisions(msg.id).catch(() => [] as MessageRevisionRow[]);
             for (const rev of revs) {
               const mappedMsgId = idMap.get(rev.message_id) ?? rev.message_id;
-              await Repo.createMessageRevision(supabase!, userId, {
+              const createdRevision = await Repo.createMessageRevision(supabase!, userId, {
                 message_id: mappedMsgId,
                 revision_no: rev.revision_no,
                 content_text: rev.content_text,
-              }).catch(() => {});
-              result.created++;
+              }).catch(() => null);
+              if (createdRevision) {
+                result.created++;
+              } else {
+                result.failed++;
+              }
             }
           }
         } catch { result.failed++; }

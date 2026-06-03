@@ -26,14 +26,14 @@ export function ContextSectionCard({
   const levelStyles = {
     1: "neo-panel-soft",
     2: "neo-panel-soft",
-    3: "neo-panel-soft bg-slate-50/75",
+    3: "neo-panel-soft",
   };
 
   const variantStyles = {
     default: "",
     active: "ring-1 ring-brand-200/60 shadow-[0_12px_32px_rgba(96,165,250,0.12)]",
     muted: "opacity-80",
-    debug: "bg-slate-50/85",
+    debug: "theme-section-accent",
   };
 
   return (

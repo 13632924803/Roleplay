@@ -93,7 +93,7 @@ function PickerModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+      <div className="theme-modal-overlay absolute inset-0" onClick={onClose} />
       <div className="neo-panel relative mx-4 flex max-h-[72vh] w-full max-w-sm flex-col p-5">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-semibold">{title}</h3>
@@ -292,8 +292,8 @@ export function ContextPreview(props: ContextPreviewProps) {
   }
 
   return (
-    <div className="flex h-full flex-col bg-gradient-to-b from-white/80 to-sky-50/25">
-      <div className="border-b border-white/45 px-4 py-4">
+    <div className="flex h-full flex-col">
+      <div className="theme-nav-shell rounded-none border-x-0 border-t-0 px-4 py-4">
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-50 to-sky-50 text-brand-500 shadow-sm">
             <Cpu className="h-4 w-4" />

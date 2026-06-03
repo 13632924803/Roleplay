@@ -118,7 +118,7 @@ export function WorldbookEntryEditor({ entry, worldbook, onSave, onClose }: Worl
         {triggers.length > 0 ? (
           <div className="mt-2 flex flex-wrap gap-1.5">
             {triggers.map((trigger) => (
-              <span key={trigger} className="neo-pill inline-flex items-center gap-1 bg-sky-50/70 text-xs text-sky-600">
+              <span key={trigger} className="neo-pill theme-pill-info inline-flex items-center gap-1 text-xs">
                 {trigger}
                 <button type="button" onClick={() => setTriggers(triggers.filter((item) => item !== trigger))} className="p-0.5 hover:text-rose-500">
                   <Trash2 className="h-2.5 w-2.5" />
@@ -136,7 +136,7 @@ export function WorldbookEntryEditor({ entry, worldbook, onSave, onClose }: Worl
         <p className="mt-1 text-xs text-ink-300">数值越高越优先注入，Token 预算紧张时低优先级可能被跳过。</p>
       </div>
 
-      <div className="mobile-modal-safe-footer sticky bottom-0 z-10 -mx-1 mt-6 flex gap-2 rounded-[24px] border border-white/55 bg-white/82 px-1 py-2 backdrop-blur-xl">
+      <div className="theme-editor-footer mobile-modal-safe-footer sticky bottom-0 z-10 -mx-1 mt-6 flex gap-2 rounded-[24px] px-1 py-2">
         <button
           type="button"
           onClick={handleSave}

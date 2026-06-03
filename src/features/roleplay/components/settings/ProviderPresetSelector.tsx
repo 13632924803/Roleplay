@@ -742,6 +742,10 @@ export function ProviderPresetSelector() {
   const showDeviceConfigDisclosure = hostedAvailable && deviceConfigs.length > 0;
   const currentHostedCredentialId =
     enabledConfig?.storageMode === "hosted_encrypted" ? enabledConfig.credentialId ?? selectedHostedId : selectedHostedId;
+  const visibleEnabledConfig =
+    !hostedAvailable && enabledConfig?.storageMode === "hosted_encrypted"
+      ? deviceConfigs.find((config) => config.enabled) ?? null
+      : enabledConfig;
 
   return (
     <div className="space-y-5">
@@ -750,12 +754,14 @@ export function ProviderPresetSelector() {
         <h3 className="text-sm font-semibold text-ink-700">API Provider 配置</h3>
       </div>
 
-      {enabledConfig ? (
+      {visibleEnabledConfig ? (() => {
+        const enabledConfig = visibleEnabledConfig;
+        return (
         <div className="neo-panel-soft rounded-[28px] px-4 py-4">
           <div className="flex items-center gap-2">
             <Check className="h-4 w-4 text-brand-600" />
             <span className="text-sm font-medium text-brand-700">当前启用</span>
-            <ProviderStatusDot status={enabledConfig.testStatus} />
+            <ProviderStatusDot status={visibleEnabledConfig.testStatus} />
           </div>
           <p className="mt-1 text-xs text-ink-500">
             {(enabledConfig.label || getPresetName(enabledConfig.provider))} · {enabledConfig.model || "未选择模型"} ·{" "}
@@ -765,7 +771,8 @@ export function ProviderPresetSelector() {
             <p className="text-[11px] text-ink-400">最近测试：{new Date(enabledConfig.lastTestedAt).toLocaleString()}</p>
           ) : null}
         </div>
-      ) : (
+        );
+      })() : (
         <div className="rounded-[28px] border border-amber-100/80 bg-amber-light/20 px-4 py-3 shadow-[0_14px_40px_rgba(251,191,36,0.12)]">
           <div className="flex items-start gap-2">
             <AlertTriangle className="mt-0.5 h-4 w-4 text-amber-500" />

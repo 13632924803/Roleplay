@@ -45,7 +45,7 @@ export function PwaUpdatePrompt() {
   return (
     <div className="mobile-bottom-nav-floating-offset md:bottom-4 fixed left-1/2 z-50 mx-4 w-full max-w-sm -translate-x-1/2">
       <div 
-        className="neo-surface p-4 flex items-center gap-3"
+        className="theme-page-shell flex items-center gap-3 p-4"
         style={{ borderRadius: '20px' }}
       >
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-500">

@@ -37,7 +37,7 @@ export function DesktopSidebar() {
 
   return (
     <aside
-      className={`relative flex h-full flex-shrink-0 flex-col overflow-hidden neo-surface transition-all duration-[320ms] ${collapsed ? "w-16" : "w-60"}`}
+      className={`theme-sidebar-shell relative flex h-full flex-shrink-0 flex-col overflow-hidden transition-all duration-[320ms] ${collapsed ? "w-16" : "w-60"}`}
       style={{ borderRadius: "28px" }}
     >
       <div className={`relative z-20 px-3 py-5 ${collapsed ? "flex flex-col items-center gap-3" : ""}`}>
@@ -45,22 +45,20 @@ export function DesktopSidebar() {
           <>
             <Link
               to="/"
-              className="neo-button flex h-9 w-9 items-center justify-center"
-              style={{ borderRadius: "14px", background: "linear-gradient(135deg, rgb(99, 102, 241), rgb(79, 70, 229))" }}
+              className="flex h-9 w-9 items-center justify-center rounded-[14px]"
               title="角色酒馆"
               aria-label="角色酒馆"
             >
-              <Drama className="h-4 w-4 text-white" />
+              <span className="theme-logo-badge flex h-full w-full items-center justify-center rounded-[14px]">
+                <Drama className="h-4 w-4 text-white" />
+              </span>
             </Link>
             <SidebarCollapseButton collapsed={collapsed} onToggle={toggleCollapsed} side="left" />
           </>
         ) : (
           <div className="flex items-center justify-between gap-3 px-1">
             <Link to="/" className="flex min-w-0 items-center gap-2.5">
-              <div
-                className="flex h-9 w-9 items-center justify-center shadow-sm"
-                style={{ borderRadius: "14px", background: "linear-gradient(135deg, rgb(99, 102, 241), rgb(79, 70, 229))" }}
-              >
+              <div className="theme-logo-badge flex h-9 w-9 items-center justify-center rounded-[14px]">
                 <Drama className="h-4 w-4 text-white" />
               </div>
               <span className="truncate text-base font-semibold text-ink-900">角色酒馆</span>
@@ -77,11 +75,9 @@ export function DesktopSidebar() {
             to={to}
             end={to === "/"}
             className={({ isActive }) =>
-              `flex h-11 items-center gap-3 px-3 text-sm font-medium transition-all duration-150 ${
-                isActive
-                  ? "neo-button-pressed text-brand-700"
-                  : "neo-button text-ink-500 hover:text-ink-700"
-              } ${collapsed ? "justify-center" : ""}`
+              `neo-button flex h-11 items-center gap-3 px-3 text-sm font-medium transition-all duration-150 ${
+                isActive ? "neo-button-pressed text-brand-700" : "text-ink-500 hover:text-ink-700"
+              } ${collapsed ? "justify-center" : "justify-start"}`
             }
             style={{ borderRadius: "16px" }}
             title={collapsed ? label : undefined}
@@ -96,11 +92,9 @@ export function DesktopSidebar() {
           <NavLink
             to="/admin"
             className={({ isActive }) =>
-              `flex h-11 items-center gap-3 px-3 text-sm font-medium transition-all duration-150 ${
-                isActive
-                  ? "neo-button-pressed text-brand-700"
-                  : "neo-button text-ink-500 hover:text-ink-700"
-              } ${collapsed ? "justify-center" : ""}`
+              `neo-button flex h-11 items-center gap-3 px-3 text-sm font-medium transition-all duration-150 ${
+                isActive ? "neo-button-pressed text-brand-700" : "text-ink-500 hover:text-ink-700"
+              } ${collapsed ? "justify-center" : "justify-start"}`
             }
             style={{ borderRadius: "16px" }}
             title={collapsed ? "管理后台" : undefined}
@@ -112,11 +106,13 @@ export function DesktopSidebar() {
         )}
       </nav>
 
-      <div className={`relative z-10 border-t border-white/40 px-3 py-4 ${collapsed ? "flex justify-center" : ""}`}>
+      <div
+        className={`relative z-10 border-t px-3 py-4 ${collapsed ? "flex justify-center" : ""}`}
+        style={{ borderColor: "var(--border-soft)" }}
+      >
         {collapsed ? (
           <div
-            className="neo-surface-soft flex h-10 w-10 items-center justify-center"
-            style={{ borderRadius: "16px" }}
+            className="neo-surface-soft flex h-10 w-10 items-center justify-center rounded-[16px]"
             title={compactAccountTitle}
             aria-label={compactAccountTitle}
           >
@@ -127,7 +123,7 @@ export function DesktopSidebar() {
             )}
           </div>
         ) : (
-          <div className="neo-surface-soft flex flex-col gap-2.5 p-3.5" style={{ borderRadius: "20px" }}>
+          <div className="neo-surface-soft flex flex-col gap-2.5 rounded-[20px] p-3.5">
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs text-ink-400">{accountLabel}</span>
               <ModeBadge />
@@ -159,10 +155,7 @@ export function DesktopSidebar() {
                       type="button"
                       onClick={handleSignOut}
                       disabled={signOutBusy}
-                      className="neo-button-primary flex flex-1 items-center justify-center px-2 py-1.5 text-[11px] font-semibold"
-                      style={{
-                        background: "linear-gradient(135deg, rgba(225, 29, 72, 0.85), rgba(244, 63, 94, 0.82))",
-                      }}
+                      className="neo-button-danger flex flex-1 items-center justify-center px-2 py-1.5 text-[11px] font-semibold"
                     >
                       {signOutBusy ? "..." : "确认退出"}
                     </button>
@@ -173,7 +166,7 @@ export function DesktopSidebar() {
               <>
                 {isGuestOrDemo && (
                   <p className="text-xs leading-relaxed text-ink-400">
-                    未登录时你仍可继续使用本地模式。登录只是为了开启云端同步和多设备互通。
+                    未登录时仍可继续使用本地模式。登录仅用于开启云端同步和多设备互通。
                   </p>
                 )}
                 <Link
