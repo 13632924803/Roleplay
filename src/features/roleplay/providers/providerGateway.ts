@@ -160,6 +160,7 @@ export function sendProviderStreamRequest(
   if (isGuestOrDemo) return mockProvider.chatStream(config, messages, signal);
   const validationError = validateConfig(config);
   if (validationError) {
+    // eslint-disable-next-line require-yield -- intentional: async iterable that throws on iteration
     return (async function* () {
       throw validationError;
     })();
