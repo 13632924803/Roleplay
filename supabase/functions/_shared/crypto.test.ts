@@ -24,3 +24,13 @@ describe("crypto round-trip", () => {
     expect(a).not.toHaveLength(0);
   });
 });
+
+describe("crypto secret hardening", () => {
+  it("throws on an invalid (non-base64 / wrong-length) secret instead of weak fallback", async () => {
+    (globalThis as Record<string, unknown>).Deno = {
+      env: { get: (k: string) => (k === "API_KEY_ENCRYPTION_SECRET" ? "too-short" : undefined) },
+    };
+    const { encryptApiKey } = await import("./crypto.ts");
+    await expect(encryptApiKey("x")).rejects.toThrow();
+  });
+});

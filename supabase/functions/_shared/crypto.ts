@@ -15,22 +15,23 @@ function base64ToBytes(value: string): Uint8Array {
   return Uint8Array.from(binary, (char) => char.charCodeAt(0));
 }
 
-async function deriveKeyBytes(secret: string): Promise<Uint8Array> {
+function deriveKeyBytes(secret: string): Uint8Array {
+  let decoded: Uint8Array;
   try {
-    const decoded = base64ToBytes(secret);
-    if (decoded.byteLength === 16 || decoded.byteLength === 24 || decoded.byteLength === 32) {
-      return decoded;
-    }
+    decoded = base64ToBytes(secret);
   } catch {
-    // Fall through to hash-based derivation.
+    throw new Error("API_KEY_ENCRYPTION_SECRET must be valid base64.");
   }
-
-  const digest = await crypto.subtle.digest("SHA-256", textEncoder.encode(secret));
-  return new Uint8Array(digest);
+  if (decoded.byteLength !== 16 && decoded.byteLength !== 24 && decoded.byteLength !== 32) {
+    throw new Error(
+      "API_KEY_ENCRYPTION_SECRET must decode to 16/24/32 bytes (recommend 32).",
+    );
+  }
+  return decoded;
 }
 
 async function importAesKey(secret: string): Promise<CryptoKey> {
-  const keyBytes = await deriveKeyBytes(secret);
+  const keyBytes = deriveKeyBytes(secret);
   return crypto.subtle.importKey(
     "raw",
     keyBytes,
@@ -41,7 +42,7 @@ async function importAesKey(secret: string): Promise<CryptoKey> {
 }
 
 async function importHmacKey(secret: string): Promise<CryptoKey> {
-  const keyBytes = await deriveKeyBytes(secret);
+  const keyBytes = deriveKeyBytes(secret);
   return crypto.subtle.importKey(
     "raw",
     keyBytes,
