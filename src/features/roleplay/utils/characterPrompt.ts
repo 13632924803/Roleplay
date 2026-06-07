@@ -65,12 +65,46 @@ export const EMPTY_CARD: CharacterCardData = {
   extra_settings: {},
 };
 
+export function getBoundWorldbookId(c: CharacterRow): string | null {
+  const ex = (c.card_json as Record<string, unknown>)?.extra_settings as Record<string, unknown> | undefined;
+  const bindings = ex?.bindings as Record<string, unknown> | undefined;
+  const id = bindings?.worldbook_id;
+  return typeof id === "string" && id ? id : null;
+}
+
+function getSillyTavern(c: CharacterRow): Record<string, unknown> | null {
+  const ex = (c.card_json as Record<string, unknown>)?.extra_settings as Record<string, unknown> | undefined;
+  const st = ex?.sillytavern as Record<string, unknown> | undefined;
+  return st ?? null;
+}
+
 // Build the full role system prompt sent to the provider.
 export function buildCharacterSystemPrompt(
   c: CharacterRow,
   templateContent?: string,
 ): string {
   const card = parseCharacterCard(c);
+
+  // SillyTavern branch: imported cards are assembled the ST way; native cards
+  // fall through to the existing Chinese structure below (behavior unchanged).
+  const st = getSillyTavern(c);
+  if (st) {
+    const parts: string[] = [`你正在扮演「${c.name}」。保持角色，不要跳出。`];
+    if (card.identity) parts.push(card.identity);
+    if (card.personality) parts.push(`Personality: ${card.personality}`);
+    if (card.background) parts.push(`Scenario: ${card.background}`);
+    const sys = String(st.system_prompt ?? "").trim();
+    if (sys) parts.push(sys);
+    const example = String(st.mes_example ?? "").trim();
+    if (example) parts.push(`Example dialogue:\n${example}`);
+    const post = String(st.post_history_instructions ?? "").trim();
+    if (post) parts.push(post);
+    const body = parts.join("\n\n");
+    if (!templateContent) return body;
+    return `${templateContent
+      .replace(/\{\{char\}\}/g, c.name)
+      .replace(/\{\{user\}\}/g, card.user_nickname || "用户")}\n\n---\n${body}`;
+  }
 
   const roleParts: string[] = [
     `你正在扮演「${c.name}」。`,

@@ -7,6 +7,7 @@ import {
   buildSessionMeta,
   SESSION_META_VERSION,
   EMPTY_CARD,
+  getBoundWorldbookId,
 } from "./characterPrompt";
 import type { CharacterRow } from "../types/database";
 
@@ -61,5 +62,32 @@ describe("session meta", () => {
   });
   it("returns fresh meta for legacy/non-json prompt", () => {
     expect(parseSessionMeta("一段旧的纯文本提示词")._meta_version).toBe(SESSION_META_VERSION);
+  });
+});
+
+describe("SillyTavern branch", () => {
+  it("builds an ST-style prompt when sillytavern data is present", () => {
+    const c = char({
+      extra_settings: {
+        sillytavern: {
+          sourceSpec: "v2",
+          raw: {},
+          system_prompt: "Be concise.",
+          post_history_instructions: "Stay in character.",
+        },
+      },
+      identity: "a fox spirit",
+      personality: "tsundere",
+      background: "a quiet tavern",
+    });
+    const p = buildCharacterSystemPrompt(c);
+    expect(p).toContain("a fox spirit");
+    expect(p).toContain("Be concise.");
+    expect(p).toContain("Stay in character.");
+  });
+  it("reads the bound worldbook id", () => {
+    const c = char({ extra_settings: { bindings: { worldbook_id: "wb-1" } } });
+    expect(getBoundWorldbookId(c)).toBe("wb-1");
+    expect(getBoundWorldbookId(char({}))).toBeNull();
   });
 });
