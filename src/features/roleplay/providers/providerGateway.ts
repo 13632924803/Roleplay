@@ -19,6 +19,7 @@ import { configError } from "./providerErrors";
 import { sendHostedProviderChat, sendHostedProviderChatStream, testHostedCredential } from "../services/hostedCredentialsService";
 import { loadApiKey } from "../storage/apiKeyStorage";
 import { getCompatibilityAdapterType } from "./providerPresets";
+import { createStreamQueue } from "./streamQueue";
 
 const adapters = new Map<ProviderType, ProviderAdapter>([
   ["mock", mockProvider],
@@ -168,61 +169,35 @@ export function sendProviderStreamRequest(
 
   if (config.apiKeyStorageMode === "hosted_encrypted" && config.credentialId) {
     return (async function* () {
-      const chunks: { content: string }[] = [];
+      const queue = createStreamQueue<ChatStreamChunk>();
       let hostedUsage: ProviderUsage | null = null;
-      let streamError: Error | null = null;
-      let streamDone = false;
 
-      const donePromise = new Promise<void>((resolve) => {
-        sendHostedProviderChatStream(
-          {
-            credential_id: config.credentialId as string,
-            provider_type: config.provider as Exclude<ProviderType, "mock">,
-            model: config.model,
-            messages,
-            temperature: config.temperature,
-            max_tokens: config.maxTokens,
-            userId: config.userId,
+      // Producer: hosted SSE callbacks feed the queue. No polling — the
+      // consumer below is woken the moment a delta arrives.
+      sendHostedProviderChatStream(
+        {
+          credential_id: config.credentialId as string,
+          provider_type: config.provider as Exclude<ProviderType, "mock">,
+          model: config.model,
+          messages,
+          temperature: config.temperature,
+          max_tokens: config.maxTokens,
+          userId: config.userId,
+        },
+        {
+          onDelta: (text) => queue.push({ content: text, done: false }),
+          onUsage: (usage) => {
+            hostedUsage = usage;
           },
-          {
-            onDelta: (text) => {
-              chunks.push({ content: text });
-            },
-            onUsage: (usage) => {
-              hostedUsage = usage;
-            },
-            onDone: () => {
-              streamDone = true;
-              resolve();
-            },
-            onError: (error) => {
-              streamError = error;
-              resolve();
-            },
-          },
-          signal,
-        );
-      });
+          onDone: () => queue.close(),
+          onError: (error) => queue.fail(error),
+        },
+        signal,
+      );
 
-      // Yield deltas as they accumulate (poll every 80ms, yield new content)
-      // We use a polling approach since the stream callback fills chunks array
-      const pollInterval = 80;
-      let yieldedCount = 0;
-      while (!streamDone && !streamError && !signal?.aborted) {
-        await Promise.race([
-          donePromise,
-          new Promise((r) => setTimeout(r, pollInterval)),
-        ]);
-        while (yieldedCount < chunks.length) {
-          yield { content: chunks[yieldedCount].content, done: false };
-          yieldedCount++;
-        }
-      }
-
-      // Yield any remaining chunks
-      while (yieldedCount < chunks.length) {
-        yield { content: chunks[yieldedCount].content, done: false };
-        yieldedCount++;
+      // Consumer: yield deltas as they arrive. queue.fail() surfaces as a throw.
+      for await (const chunk of queue.iterable) {
+        yield chunk;
       }
 
       if (signal?.aborted) {
@@ -230,15 +205,12 @@ export function sendProviderStreamRequest(
         return;
       }
 
-      if (streamError) {
-        throw streamError;
-      }
-
       const usage =
         hostedUsage ??
         {
           usageAvailable: false,
-          usageUnavailableReason: "托管聊天服务未返回本次用量，请确认 hosted-provider-chat 已部署到最新版本。",
+          usageUnavailableReason:
+            "托管聊天服务未返回本次用量，请确认 hosted-provider-chat 已部署到最新版本。",
           rawUsage: null,
           sourceProvider: config.provider,
         };
