@@ -17,7 +17,7 @@ import * as Repo from "../repositories/roleplayRepository";
 import * as LocalRepo from "../repositories/localRoleplayRepository";
 import * as LocalMirror from "../repositories/localMirror";
 import type { CharacterRow, ContextRunRow, MemoryRow, MessageRevisionRow, PromptTemplateRow, SessionRow } from "../types/database";
-import { buildCharacterSystemPrompt, buildSessionMeta, parseSessionMeta, SESSION_META_VERSION, type SessionMeta } from "../utils/characterPrompt";
+import { buildCharacterSystemPrompt, buildSessionMeta, parseSessionMeta, SESSION_META_VERSION, getBoundWorldbookId, type SessionMeta } from "../utils/characterPrompt";
 import { buildContext, type CacheDiagnostics, type CacheDiagnosticsRecord, type ContextBuildOutput } from "../context/contextBuilder";
 import { getPresetName } from "../providers/providerPresets";
 import { estimateDeepSeekCost } from "../providers/pricing/deepseekPricing";
@@ -715,10 +715,13 @@ export function useChatSession(
       const character = characterId
         ? (isLocalMode ? await LocalRepo.getCharacter(characterId) : await Repo.getCharacter(supabase!, characterId))
         : null;
+      const boundWbId = character ? getBoundWorldbookId(character) : null;
+      const initialWbIds = boundWbId ? [boundWbId] : [];
       const title = character ? `${character.name} - new chat` : `New chat ${new Date().toLocaleTimeString("zh-CN")}`;
+      const sessionMeta = buildSessionMeta({ _meta_version: SESSION_META_VERSION, _worldbook_ids: initialWbIds });
       const row = isLocalMode
-        ? await LocalRepo.createSession({ title, primary_character_id: characterId ?? undefined, system_prompt: buildSessionMeta({ _meta_version: SESSION_META_VERSION }) })
-        : await Repo.createSession(supabase!, userId!, { title, primary_character_id: characterId ?? undefined, system_prompt: buildSessionMeta({ _meta_version: SESSION_META_VERSION }) });
+        ? await LocalRepo.createSession({ title, primary_character_id: characterId ?? undefined, system_prompt: sessionMeta })
+        : await Repo.createSession(supabase!, userId!, { title, primary_character_id: characterId ?? undefined, system_prompt: sessionMeta });
       if (!row) throw new Error("create session failed");
       if (!isLocalMode && row) LocalMirror.mirrorSession(row);
       if (characterId) {
@@ -761,7 +764,7 @@ export function useChatSession(
         activeCharacter: character,
         activeTemplate: null,
         messages,
-        worldbookIds: [],
+        worldbookIds: initialWbIds,
         memoryIds: [],
         disabledWbIds: [],
         disabledMemIds: [],

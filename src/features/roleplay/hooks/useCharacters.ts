@@ -10,7 +10,7 @@ interface UseCharactersReturn {
   characters: CharacterRow[];
   loading: boolean;
   error: string | null;
-  create: (name: string, card: CharacterCardData, tags?: string[]) => Promise<CharacterRow | null>;
+  create: (name: string, card: CharacterCardData, tags?: string[], avatarPath?: string) => Promise<CharacterRow | null>;
   update: (id: string, name: string, card: CharacterCardData, tags?: string[]) => Promise<CharacterRow | null>;
   remove: (id: string) => Promise<void>;
   archive: (id: string) => Promise<void>;
@@ -46,9 +46,9 @@ export function useCharacters(userId: string | undefined, isDemo: boolean): UseC
 
   useEffect(() => { refresh(); }, [refresh]);
 
-  const create = useCallback(async (name: string, card: CharacterCardData, tags?: string[]) => {
+  const create = useCallback(async (name: string, card: CharacterCardData, tags?: string[], avatarPath?: string) => {
     try {
-      const payload = { name, card_json: packCharacterCard(card), tags: tags ?? [] };
+      const payload = { name, card_json: packCharacterCard(card), tags: tags ?? [], ...(avatarPath ? { avatar_path: avatarPath } : {}) };
       const row = isDemo || !supabase || !userId
         ? await LocalRepo.createCharacter(payload)
         : await Repo.createCharacter(supabase, userId, payload);
