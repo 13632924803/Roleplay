@@ -28,3 +28,9 @@ playwright-mcp/
 .playwright-mcp/
 
 .claude/
+
+# Test / coverage output
+coverage/
+playwright-report/
+test-results/
+dev-dist/
