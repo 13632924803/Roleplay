@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { BookOpen, Brain, FileText, Palette, Users } from "lucide-react";
 import { useAuth } from "../features/auth";
 import { AppModal } from "../shared/components/AppModal";
@@ -22,6 +22,10 @@ import type {
   WorldbookEntryRow,
   WorldbookRow,
 } from "../features/roleplay/types/database";
+import { prepareImport } from "../features/roleplay/import/prepareImport";
+import type { PreparedImport } from "../features/roleplay/import/types";
+import { ImportPreviewModal } from "../features/roleplay/components/studio/ImportPreviewModal";
+import { logger } from "../shared/lib/logger";
 
 type Tab = "characters" | "templates" | "worldbooks" | "memories";
 
@@ -92,6 +96,37 @@ export function StudioPage() {
   const [editingWb, setEditingWb] = useState<WorldbookRow | null>(null);
   const [editingMem, setEditingMem] = useState<MemoryRow | null>(null);
   const [showMemEditor, setShowMemEditor] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [prepared, setPrepared] = useState<PreparedImport | null>(null);
+
+  async function handleImportFile(file: File) {
+    try {
+      setPrepared(await prepareImport(file));
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "导入失败：无法识别该文件。");
+      logger.warn("[import] failed", e);
+    }
+  }
+
+  async function confirmImport() {
+    if (!prepared) return;
+    let worldbookId: string | null = null;
+    if (prepared.worldbook) {
+      const wb = await wbs.createWb(prepared.worldbook.name);
+      if (wb) {
+        worldbookId = wb.id;
+        for (const entry of prepared.worldbook.entries) {
+          await wbs.createEntry(wb.id, entry.title, entry.content, entry.triggers, entry.priority);
+        }
+      }
+    }
+    const card = {
+      ...prepared.card,
+      extra_settings: { ...prepared.card.extra_settings, bindings: { worldbook_id: worldbookId } },
+    };
+    await chars.create(prepared.name, card, prepared.tags, prepared.avatarDataUrl ?? undefined);
+    setPrepared(null);
+  }
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode; count: number }[] = [
     { key: "characters", label: "角色卡", icon: <Users className="h-4 w-4" />, count: chars.filtered.length },
@@ -163,6 +198,7 @@ export function StudioPage() {
               setEditingChar(null);
               setShowCharEditor(true);
             }}
+            onImport={() => fileInputRef.current?.click()}
           />
         ) : null}
 
@@ -406,6 +442,33 @@ export function StudioPage() {
                 }
                 await mems.create(content, type, title, salience);
               }}
+            />
+          </AppModal>
+        ) : null}
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json,.png,.charx"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) void handleImportFile(f);
+            e.target.value = "";
+          }}
+        />
+        {prepared ? (
+          <AppModal
+            open
+            title="导入角色卡"
+            description="确认后将创建角色（及其内嵌世界书）。"
+            onClose={() => setPrepared(null)}
+            size="sm"
+          >
+            <ImportPreviewModal
+              prepared={prepared}
+              onConfirm={() => void confirmImport()}
+              onClose={() => setPrepared(null)}
             />
           </AppModal>
         ) : null}

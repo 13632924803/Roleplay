@@ -1,4 +1,4 @@
-import { Archive, Edit3, Plus, Search, Star, Trash2, X } from "lucide-react";
+import { Archive, Edit3, Plus, Search, Star, Trash2, Upload, X } from "lucide-react";
 import type { CharacterRow } from "../../types/database";
 import { parseCharacterCard } from "../../utils/characterPrompt";
 
@@ -14,6 +14,7 @@ interface CharacterListProps {
   onArchive: (c: CharacterRow) => void;
   onToggleFavorite: (c: CharacterRow) => void;
   onCreate: () => void;
+  onImport: () => void;
   onSelect?: (c: CharacterRow) => void;
   selectable?: boolean;
 }
@@ -30,6 +31,7 @@ export function CharacterList({
   onArchive,
   onToggleFavorite,
   onCreate,
+  onImport,
   onSelect,
   selectable,
 }: CharacterListProps) {
@@ -48,6 +50,10 @@ export function CharacterList({
             className="neo-input w-full rounded-input py-2.5 pl-9 pr-3 text-sm"
           />
         </div>
+        <button onClick={onImport} className="neo-button flex items-center gap-1.5 rounded-[20px] px-4 py-2.5 text-xs text-ink-500">
+          <Upload className="h-3.5 w-3.5" />
+          导入
+        </button>
         <button onClick={onCreate} className="neo-button-primary flex items-center gap-1.5 rounded-[20px] px-4 py-2.5 text-xs">
           <Plus className="h-3.5 w-3.5" />
           创建
@@ -92,8 +98,12 @@ export function CharacterList({
                   selectable ? "cursor-pointer hover:-translate-y-0.5 hover:ring-1 hover:ring-brand-200/60" : ""
                 } ${character.archived_at ? "opacity-50" : ""}`}
               >
-                <div className="neo-panel-soft flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[18px] text-lg text-brand-500">
-                  {character.avatar_emoji || character.name[0]}
+                <div className="neo-panel-soft flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-[18px] text-lg text-brand-500">
+                  {character.avatar_path?.startsWith("data:") ? (
+                    <img src={character.avatar_path} alt={character.name} className="h-full w-full object-cover" />
+                  ) : (
+                    character.avatar_emoji || character.name[0]
+                  )}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
