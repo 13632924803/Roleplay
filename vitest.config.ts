@@ -10,6 +10,7 @@ export default defineConfig({
     environment: "jsdom",
     environmentOptions: { jsdom: { url: "http://localhost:3000" } },
     setupFiles: ["./src/test/setup.ts"],
+    restoreMocks: true,
     include: ["src/**/*.test.{ts,tsx}", "supabase/**/*.test.ts", "*.test.ts"],
     coverage: {
       provider: "v8",
