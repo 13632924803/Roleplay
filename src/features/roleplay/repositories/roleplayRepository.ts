@@ -1,3 +1,4 @@
+import { logger } from "../../../shared/lib/logger";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   ProfileRow,
@@ -48,12 +49,12 @@ export async function getCurrentProfile(
       .eq("id", userId)
       .maybeSingle();
     if (error) {
-      console.warn("[Repo] getCurrentProfile error:", error.message);
+      logger.warn("[Repo] getCurrentProfile error:", error.message);
       return null;
     }
     return data as ProfileRow | null;
   } catch (err) {
-    console.warn("[Repo] getCurrentProfile exception:", err);
+    logger.warn("[Repo] getCurrentProfile exception:", err);
     return null;
   }
 }
@@ -78,12 +79,12 @@ export async function ensureProfile(
       .maybeSingle();
 
     if (error) {
-      console.warn("[Repo] ensureProfile insert error:", error.message);
+      logger.warn("[Repo] ensureProfile insert error:", error.message);
       return null;
     }
     return data as ProfileRow | null;
   } catch (err) {
-    console.warn("[Repo] ensureProfile exception:", err);
+    logger.warn("[Repo] ensureProfile exception:", err);
     return null;
   }
 }
@@ -109,12 +110,12 @@ export async function ensureUserRole(
       .insert({ user_id: userId, role });
 
     if (error) {
-      console.warn("[Repo] ensureUserRole insert error:", error.message);
+      logger.warn("[Repo] ensureUserRole insert error:", error.message);
       return false;
     }
     return true;
   } catch (err) {
-    console.warn("[Repo] ensureUserRole exception:", err);
+    logger.warn("[Repo] ensureUserRole exception:", err);
     return false;
   }
 }
@@ -368,7 +369,7 @@ export async function ensureSessionParticipant(
       },
       { onConflict: "session_id,character_id" },
     );
-  if (error) console.warn("[Repo] ensureSessionParticipant error:", error.message);
+  if (error) logger.warn("[Repo] ensureSessionParticipant error:", error.message);
 }
 
 // ---------- messages ----------
@@ -466,7 +467,7 @@ export async function createMessage(
   input: CreateMessage,
 ): Promise<MessageRow | null> {
   if (input.role === "assistant" && "character_id" in input && input.character_id === undefined) {
-    console.warn("[Repo] assistant message is being saved without character_id.");
+    logger.warn("[Repo] assistant message is being saved without character_id.");
   }
   const { data } = await supabase
     .from("messages")
@@ -1200,7 +1201,7 @@ export async function listRecentContextRuns(
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) {
-    console.warn("[Repo] listRecentContextRuns failed:", error);
+    logger.warn("[Repo] listRecentContextRuns failed:", error);
     return [];
   }
   return (data as ContextRunRow[]) ?? [];

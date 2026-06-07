@@ -1,3 +1,4 @@
+import { logger } from "../../../shared/lib/logger";
 import type { ApiKeyStorageMode, ProviderType } from "../providers/provider.types";
 
 const STORAGE_PREFIX = "rp_tavern_";
@@ -51,7 +52,7 @@ export function saveApiKeyLocalDevice(
   try {
     localStorage.setItem(storageKey(provider), JSON.stringify(config));
   } catch (error) {
-    console.error("本地保存 API Key 失败", error);
+    logger.error("本地保存 API Key 失败", error);
     throw new Error("浏览器本地存储不可用，请改用“仅本次会话”保存。");
   }
 }

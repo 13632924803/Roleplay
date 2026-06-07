@@ -1,4 +1,5 @@
-﻿import { useCallback, useEffect, useRef, useState } from "react";
+import { logger } from "../../../shared/lib/logger";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "../../auth/supabaseClient";
 import type {
   ApiKeyStorageMode,
@@ -568,7 +569,7 @@ export function useChatSession(
         : await Repo.listMemoriesByStatus(supabase!, userId!, ["suggested"], sessionId ?? undefined);
       setState((s) => ({ ...s, suggestedMemories: rows }));
     } catch (error) {
-      console.warn("[Chat] suggested memories load failed:", error);
+      logger.warn("[Chat] suggested memories load failed:", error);
     }
   }, [isLocalMode, userId]);
 
@@ -838,13 +839,13 @@ export function useChatSession(
         (isLocalMode
           ? LocalRepo.getMessageRevisionCounts(page.rows.map((row) => row.id))
           : Repo.getMessageRevisionCounts(supabase!, page.rows.map((row) => row.id))).catch((error) => {
-          console.warn("[Chat] message revision count load failed:", error);
+          logger.warn("[Chat] message revision count load failed:", error);
           return new Map<string, number>();
         }),
         5000,
         "message revision count load timed out",
       ).catch((error) => {
-        console.warn("[Chat] message revision count load failed:", error);
+        logger.warn("[Chat] message revision count load failed:", error);
         return new Map<string, number>();
       });
       const metadata = buildIndexedMessageMetadata(page.rows, revisionCounts);
@@ -855,7 +856,7 @@ export function useChatSession(
         5000,
         "context run load timed out",
       ).catch((error) => {
-        console.warn("[Chat] context run load failed:", error);
+        logger.warn("[Chat] context run load failed:", error);
         return null;
       });
       const latestDiag = readDiagnosticsFromContextRun(latestContextRun);
@@ -1505,7 +1506,7 @@ export function useChatSession(
           }
           if (aiContent) {
             if (hasRoleSession && !characterId) {
-              console.warn("[Chat] refusing to save role assistant message without character_id", { sessionId });
+              logger.warn("[Chat] refusing to save role assistant message without character_id", { sessionId });
             } else {
               const asstMsg = isLocalMode
                 ? await LocalRepo.createMessage({ session_id: sessionId, branch_id: branchId, role: "assistant", content_text: aiContent, character_id: characterId ?? undefined })
@@ -1526,7 +1527,7 @@ export function useChatSession(
                       revision_no: 1,
                       content_text: opts.oldAssistantContentForRevision,
                     })).catch((e) => {
-                  console.warn("[Chat] assistant revision save failed:", e);
+                  logger.warn("[Chat] assistant revision save failed:", e);
                   return null;
                 });
                 if (!isLocalMode && revResult) LocalMirror.mirrorMessageRevision(revResult);
@@ -1591,7 +1592,7 @@ export function useChatSession(
             if (!isLocalMode && cr) LocalMirror.mirrorContextRun(cr);
             setState((s) => ({ ...s, contextRunSaveStatus: "saved" }));
           }).catch((e) => {
-            console.warn("[Chat] context_run save failed:", e);
+            logger.warn("[Chat] context_run save failed:", e);
             setState((s) => ({ ...s, contextRunSaveStatus: "failed" }));
           });
         }
@@ -1650,7 +1651,7 @@ export function useChatSession(
       .slice(messageIndex + 1)
       .find((message) => message.role === "assistant")?.content ?? null;
     if (import.meta.env.DEV) {
-      console.debug("[Chat] editAndResend: oldAssistantContent=%s",
+      logger.debug("[Chat] editAndResend: oldAssistantContent=%s",
         oldAssistantContent ? oldAssistantContent.slice(0, 30) : "(none)");
     }
 
@@ -1712,7 +1713,7 @@ export function useChatSession(
             }
           }
         } catch (e) {
-          console.warn("[Chat] editAndResend DB sync failed:", e);
+          logger.warn("[Chat] editAndResend DB sync failed:", e);
         }
       }
     } else if (isLocalMode && s.activeSessionId) {
@@ -1772,7 +1773,7 @@ export function useChatSession(
             }
           }
         } catch (e) {
-          console.warn("[Chat] editAndResend local DB sync failed:", e);
+          logger.warn("[Chat] editAndResend local DB sync failed:", e);
         }
       }
     }
@@ -1801,12 +1802,12 @@ export function useChatSession(
             LocalMirror.mirrorMessageDeletion(dbId, new Date().toISOString(), "user_deleted");
           }
         } catch (e) {
-          console.warn("[Chat] deleteMessage DB sync failed:", e);
+          logger.warn("[Chat] deleteMessage DB sync failed:", e);
           setState((prev) => ({ ...prev, error: "删除消息失败，请重试" }));
           return; // Block UI removal on DB failure
         }
       } else {
-        console.warn("[Chat] deleteMessage: no dbId for message index", messageIndex);
+        logger.warn("[Chat] deleteMessage: no dbId for message index", messageIndex);
         // Still remove from UI for consistency (e.g. demo messages, or transient state)
       }
     }
@@ -1844,7 +1845,7 @@ export function useChatSession(
       });
       return revisions;
     } catch (error) {
-      console.warn("[Chat] message revisions load failed:", error);
+      logger.warn("[Chat] message revisions load failed:", error);
       return [];
     }
   }, [isLocalMode]);
@@ -1880,7 +1881,7 @@ export function useChatSession(
       const revisionCounts = await (isLocalMode
         ? LocalRepo.getMessageRevisionCounts(page.rows.map((row) => row.id))
         : Repo.getMessageRevisionCounts(supabase!, page.rows.map((row) => row.id))).catch((error) => {
-        console.warn("[Chat] older message revision count load failed:", error);
+        logger.warn("[Chat] older message revision count load failed:", error);
         return new Map<string, number>();
       });
       const metadata = buildIndexedMessageMetadata(page.rows, revisionCounts);
@@ -1907,7 +1908,7 @@ export function useChatSession(
         };
       });
     } catch (error) {
-      console.warn("[Chat] older message load failed:", error);
+      logger.warn("[Chat] older message load failed:", error);
       setState((s) => ({ ...s, isLoadingOlderMessages: false, error: "加载更早消息失败，请稍后重试。" }));
     }
   }, [isLocalMode]);

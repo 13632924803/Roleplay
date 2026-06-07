@@ -1,3 +1,4 @@
+import { logger } from "../../shared/lib/logger";
 import {
   createContext,
   useCallback,
@@ -123,7 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "INIT_START" });
 
     timeoutRef.current = setTimeout(() => {
-      console.warn("[Auth] Init timeout after", INIT_TIMEOUT_MS, "ms — forcing guest mode");
+      logger.warn("[Auth] Init timeout after", INIT_TIMEOUT_MS, "ms — forcing guest mode");
       dispatch({ type: "INIT_ERROR" });
     }, INIT_TIMEOUT_MS);
 
@@ -155,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }, 0);
       })
       .catch((err) => {
-        console.warn("[Auth] getSession failed:", err);
+        logger.warn("[Auth] getSession failed:", err);
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
         dispatch({ type: "INIT_ERROR" });
       });

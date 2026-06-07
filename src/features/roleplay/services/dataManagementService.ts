@@ -1,3 +1,4 @@
+import { logger } from "../../../shared/lib/logger";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   BackupArtifactRow,
@@ -535,7 +536,7 @@ async function rollbackImport(supabase: SupabaseClient, insertedIds: Record<stri
     const ids = insertedIds[table];
     if (!ids || ids.length === 0) continue;
     await deleteInChunks(supabase, table, ids).catch((error) => {
-      console.warn(`[DataManagement] rollback failed for ${table}:`, error);
+      logger.warn(`[DataManagement] rollback failed for ${table}:`, error);
     });
   }
 }

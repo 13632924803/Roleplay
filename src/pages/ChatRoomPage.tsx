@@ -1,4 +1,5 @@
-﻿import { useCallback, useEffect, useRef, useState } from "react";
+import { logger } from "../shared/lib/logger";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AlertTriangle, ChevronDown, Drama, KeyRound, MessageCircle, Palette, Plus, RefreshCw, Settings, WifiOff, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../features/auth";
@@ -236,7 +237,7 @@ export function ChatRoomPage() {
 
   const debugCreateSession = useCallback((message: string, extra?: Record<string, unknown>) => {
     if (import.meta.env.DEV) {
-      console.info("[mobile-create-session]", message, extra ?? {});
+      logger.info("[mobile-create-session]", message, extra ?? {});
     }
   }, []);
 

@@ -1,3 +1,4 @@
+import { logger } from "../../../../shared/lib/logger";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Brain, ChevronLeft, ChevronRight, Copy, Edit3, MoreHorizontal, RotateCcw, Trash2 } from "lucide-react";
@@ -78,7 +79,7 @@ export function MessageBubble({
       try {
         await onLoadRevisions();
       } catch (error) {
-        console.warn("[Chat] message revision lazy load failed:", error);
+        logger.warn("[Chat] message revision lazy load failed:", error);
       } finally {
         setLoadingRevisions(false);
       }

@@ -1,3 +1,4 @@
+import { logger } from "../../../shared/lib/logger";
 /**
  * LocalMirror — 登录态云端写入成功后，异步同步写一份到本地 IndexedDB。
  *
@@ -72,7 +73,7 @@ async function putRow<T extends { id: string }>(storeName: string, row: T): Prom
 
 function mirror<T extends { id: string }>(store: string, row: T, label: string): void {
   putRow(store, row).catch((e) => {
-    console.warn(`[LocalMirror] ${label} mirror failed:`, e);
+    logger.warn(`[LocalMirror] ${label} mirror failed:`, e);
   });
 }
 
@@ -145,7 +146,7 @@ export function mirrorMessageDeletion(id: string, deletedAt: string, reason?: st
       db.close();
     }
   }).catch((e) => {
-    console.warn("[LocalMirror] message deletion mirror failed:", e);
+    logger.warn("[LocalMirror] message deletion mirror failed:", e);
   });
 }
 

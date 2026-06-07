@@ -1,3 +1,4 @@
+import { logger } from "../shared/lib/logger";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import { ArrowLeft, Database, Download, FileUp, RefreshCw, RotateCcw, Shield, Trash2 } from "lucide-react";
@@ -131,7 +132,7 @@ export function DataManagementPage() {
       downloadBackupFile(fileName, jsonText);
       recordBackup(exportEstimate ? Object.values(exportEstimate).reduce((s, c) => s + c, 0) : 0);
       await recordBackupArtifact(supabase, userId, fileName, checksum).catch((error) => {
-        console.warn("[DataManagement] backup metadata record failed:", error);
+        logger.warn("[DataManagement] backup metadata record failed:", error);
       });
       setExportMessage(`导出完成：${fileName}`);
       await refreshStats();
