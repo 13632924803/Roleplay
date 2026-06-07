@@ -306,7 +306,7 @@ function stripJsonCodeFence(raw: string): string {
   return trimmed.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
 }
 
-function parseMemorySuggestionDrafts(raw: string, sourceMessageId?: string | null): MemorySuggestionDraft[] {
+export function parseMemorySuggestionDrafts(raw: string, sourceMessageId?: string | null): MemorySuggestionDraft[] {
   const normalized = stripJsonCodeFence(raw);
   let parsed: unknown;
   try {
@@ -348,13 +348,13 @@ function parseMemorySuggestionDrafts(raw: string, sourceMessageId?: string | nul
   return drafts;
 }
 
-function shiftIndexedSet(set: Set<number>, insertedCount: number): Set<number> {
+export function shiftIndexedSet(set: Set<number>, insertedCount: number): Set<number> {
   const next = new Set<number>();
   set.forEach((value) => next.add(value + insertedCount));
   return next;
 }
 
-function removeIndexedSet(set: Set<number>, removedIndex: number): Set<number> {
+export function removeIndexedSet(set: Set<number>, removedIndex: number): Set<number> {
   const next = new Set<number>();
   set.forEach((value) => {
     if (value < removedIndex) next.add(value);
@@ -363,7 +363,7 @@ function removeIndexedSet(set: Set<number>, removedIndex: number): Set<number> {
   return next;
 }
 
-function truncateIndexedSet(set: Set<number>, maxExclusive: number): Set<number> {
+export function truncateIndexedSet(set: Set<number>, maxExclusive: number): Set<number> {
   const next = new Set<number>();
   set.forEach((value) => {
     if (value < maxExclusive) next.add(value);
