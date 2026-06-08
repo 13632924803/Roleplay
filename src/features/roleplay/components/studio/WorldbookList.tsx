@@ -1,4 +1,4 @@
-import { BookOpen, ChevronRight, Edit3, Plus, Search, Trash2 } from "lucide-react";
+import { BookOpen, ChevronRight, Edit3, Plus, Search, Trash2, Upload } from "lucide-react";
 import type { WorldbookEntryRow, WorldbookRow } from "../../types/database";
 
 interface WorldbookListProps {
@@ -8,6 +8,7 @@ interface WorldbookListProps {
   activeWorldbookId: string | null;
   onSelectWb: (id: string | null) => void;
   onCreateWb: () => void;
+  onImportWb: () => void;
   onEditWb: (wb: WorldbookRow) => void;
   onDeleteWb: (wb: WorldbookRow) => void;
   onCreateEntry: () => void;
@@ -27,6 +28,7 @@ export function WorldbookList({
   activeWorldbookId,
   onSelectWb,
   onCreateWb,
+  onImportWb,
   onEditWb,
   onDeleteWb,
   onCreateEntry,
@@ -47,6 +49,10 @@ export function WorldbookList({
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-300" />
           <input type="text" value={searchQuery} onChange={(e) => onSearchChange(e.target.value)} placeholder="搜索世界书..." className="neo-input w-full rounded-input py-2.5 pl-9 pr-3 text-sm" />
         </div>
+        <button onClick={onImportWb} className="neo-button flex items-center gap-1.5 rounded-[20px] px-4 py-2.5 text-xs text-ink-500">
+          <Upload className="h-3.5 w-3.5" />
+          导入
+        </button>
         <button onClick={onCreateWb} className="neo-button-primary flex items-center gap-1.5 rounded-[20px] px-4 py-2.5 text-xs">
           <Plus className="h-3.5 w-3.5" />
           创建

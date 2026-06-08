@@ -26,6 +26,8 @@ import { prepareImport } from "../features/roleplay/import/prepareImport";
 import type { PreparedImport } from "../features/roleplay/import/types";
 import { ImportPreviewModal } from "../features/roleplay/components/studio/ImportPreviewModal";
 import { logger } from "../shared/lib/logger";
+import { parseLorebookFile } from "../features/roleplay/import/parseLorebookFile";
+import type { ImportedLorebook } from "../features/roleplay/import/types";
 
 type Tab = "characters" | "templates" | "worldbooks" | "memories";
 
@@ -98,6 +100,23 @@ export function StudioPage() {
   const [showMemEditor, setShowMemEditor] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [prepared, setPrepared] = useState<PreparedImport | null>(null);
+  const wbFileInputRef = useRef<HTMLInputElement>(null);
+  const [importedLb, setImportedLb] = useState<ImportedLorebook | null>(null);
+
+  async function handleLorebookFile(file: File) {
+    try {
+      setImportedLb(parseLorebookFile(await file.text()));
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "导入失败：无法识别该世界书文件。");
+      logger.warn("[lorebook import] failed", e);
+    }
+  }
+
+  async function confirmLorebookImport() {
+    if (!importedLb) return;
+    await wbs.importLorebook(importedLb.name, importedLb.entries);
+    setImportedLb(null);
+  }
 
   async function handleImportFile(file: File) {
     try {
@@ -112,13 +131,8 @@ export function StudioPage() {
     if (!prepared) return;
     let worldbookId: string | null = null;
     if (prepared.worldbook) {
-      const wb = await wbs.createWb(prepared.worldbook.name);
-      if (wb) {
-        worldbookId = wb.id;
-        for (const entry of prepared.worldbook.entries) {
-          await wbs.createEntry(wb.id, entry.title, entry.content, entry.triggers, entry.priority);
-        }
-      }
+      const wb = await wbs.importLorebook(prepared.worldbook.name, prepared.worldbook.entries);
+      worldbookId = wb?.id ?? null;
     }
     const card = {
       ...prepared.card,
@@ -243,6 +257,7 @@ export function StudioPage() {
               setEditingWb(null);
               setShowWbModal(true);
             }}
+            onImportWb={() => wbFileInputRef.current?.click()}
             onEditWb={(worldbook) => {
               setEditingWb(worldbook);
               setShowWbModal(true);
@@ -470,6 +485,52 @@ export function StudioPage() {
               onConfirm={() => void confirmImport()}
               onClose={() => setPrepared(null)}
             />
+          </AppModal>
+        ) : null}
+
+        <input
+          ref={wbFileInputRef}
+          type="file"
+          accept=".json"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) void handleLorebookFile(f);
+            e.target.value = "";
+          }}
+        />
+        {importedLb ? (
+          <AppModal
+            open
+            title="导入世界书"
+            description="确认后将创建世界书及其条目。"
+            onClose={() => setImportedLb(null)}
+            size="sm"
+          >
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-sm font-semibold text-ink-800">{importedLb.name}</h3>
+                <p className="text-xs text-ink-400">
+                  共 {importedLb.entries.length} 条 · 常驻{" "}
+                  {importedLb.entries.filter((e) => (e.extensions as Record<string, unknown>).constant === true).length} 条 · selective{" "}
+                  {importedLb.entries.filter((e) => (e.extensions as Record<string, unknown>).selective === true).length} 条
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => void confirmLorebookImport()}
+                  className="neo-button-primary flex-1 rounded-[18px] px-4 py-2.5 text-sm"
+                >
+                  导入
+                </button>
+                <button
+                  onClick={() => setImportedLb(null)}
+                  className="neo-button rounded-[18px] px-4 py-2.5 text-sm text-ink-600"
+                >
+                  取消
+                </button>
+              </div>
+            </div>
           </AppModal>
         ) : null}
       </div>
