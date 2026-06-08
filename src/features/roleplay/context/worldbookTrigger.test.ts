@@ -67,3 +67,38 @@ describe("triggerWorldbookEntries", () => {
     expect(r.triggered[0].injected).toBe(false);
   });
 });
+
+describe("advanced semantics", () => {
+  it("injects a constant entry with no keyword match", () => {
+    const e = entry({ id: "k", triggers: ["unrelated"], extensions: { constant: true } });
+    const r = triggerWorldbookEntries([e], "nothing here", [], null, null, new Set(["k"]));
+    expect(r.triggered[0].injected).toBe(true);
+  });
+  it("requires both primary and secondary keys when selective", () => {
+    const base = { id: "k", triggers: ["dragon"], extensions: { selective: true, secondary_keys: ["fire"] } };
+    const miss = triggerWorldbookEntries([entry(base)], "a dragon appears", [], null, null, new Set(["k"]));
+    expect(miss.triggered).toHaveLength(0); // secondary "fire" not present
+    const hit = triggerWorldbookEntries([entry(base)], "a fire dragon", [], null, null, new Set(["k"]));
+    expect(hit.triggered[0].injected).toBe(true);
+  });
+  it("respects case_sensitive", () => {
+    const lower = triggerWorldbookEntries(
+      [entry({ id: "k", triggers: ["Dragon"], extensions: { case_sensitive: true } })],
+      "a dragon",
+      [],
+      null,
+      null,
+      new Set(["k"]),
+    );
+    expect(lower.triggered).toHaveLength(0); // "dragon" != "Dragon"
+    const exact = triggerWorldbookEntries(
+      [entry({ id: "k", triggers: ["Dragon"], extensions: { case_sensitive: true } })],
+      "a Dragon",
+      [],
+      null,
+      null,
+      new Set(["k"]),
+    );
+    expect(exact.triggered[0].injected).toBe(true);
+  });
+});

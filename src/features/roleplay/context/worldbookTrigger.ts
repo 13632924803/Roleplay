@@ -22,10 +22,10 @@ type EntryWithKeywordAliases = WorldbookEntryRow & {
   keyword?: unknown;
 };
 
-function normalizeForMatch(value: string): string {
-  return value
+function normalizeForMatch(value: string, caseSensitive = false): string {
+  const cased = caseSensitive ? value : value.toLowerCase();
+  return cased
     .trim()
-    .toLowerCase()
     .replace(/[\s\u3000]+/g, "")
     .replace(/[.,!?;:'"()[\]{}<>/\\|`~@#$%^&*_+=，。！？；：“”‘’（）【】《》、…—-]/g, "");
 }
@@ -46,12 +46,12 @@ export function getEntryKeywords(entry: WorldbookEntryRow): string[] {
   return parseKeywords(withAliases.triggers ?? withAliases.keywords ?? withAliases.keyword);
 }
 
-export function matchKeywords(input: string, keywordsRaw: unknown): string[] {
-  const normalizedInput = normalizeForMatch(input);
+export function matchKeywords(input: string, keywordsRaw: unknown, caseSensitive = false): string[] {
+  const normalizedInput = normalizeForMatch(input, caseSensitive);
   if (!normalizedInput) return [];
 
   return parseKeywords(keywordsRaw).filter((keyword) => {
-    const normalizedKeyword = normalizeForMatch(keyword);
+    const normalizedKeyword = normalizeForMatch(keyword, caseSensitive);
     return normalizedKeyword.length > 0 && normalizedInput.includes(normalizedKeyword);
   });
 }
@@ -81,10 +81,27 @@ export function triggerWorldbookEntries(
       continue;
     }
 
-    const matchedKeywords = matchKeywords(triggerText, getEntryKeywords(entry));
-    if (matchedKeywords.length === 0) {
-      skipped.push({ entry, reason: "无关键词命中" });
-      continue;
+    const ext = (entry.extensions ?? {}) as Record<string, unknown>;
+    const caseSensitive = ext.case_sensitive === true;
+    let matchedKeywords: string[];
+    if (ext.constant === true) {
+      matchedKeywords = []; // constant: always triggered (still budget-limited)
+    } else {
+      const primary = matchKeywords(triggerText, getEntryKeywords(entry), caseSensitive);
+      if (primary.length === 0) {
+        skipped.push({ entry, reason: "无关键词命中" });
+        continue;
+      }
+      if (ext.selective === true) {
+        const secondary = matchKeywords(triggerText, ext.secondary_keys, caseSensitive);
+        if (secondary.length === 0) {
+          skipped.push({ entry, reason: "selective：次关键词未命中" });
+          continue;
+        }
+        matchedKeywords = [...primary, ...secondary];
+      } else {
+        matchedKeywords = primary;
+      }
     }
 
     const injected = budgetAllocatedIds.has(entry.id);

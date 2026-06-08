@@ -202,10 +202,11 @@ export function buildContext(input: ContextBuildInput): ContextBuildOutput {
   // ── C-F: Split world book into always_on vs dynamic ──
   const enabledEntries = worldbookEntries.filter((entry) => entry.enabled);
   const alwaysOnEntries = sortEntriesForContext(
-    // "always_on" entries: those with high priority or pinned/always_on flag
+    // "always_on" entries: high priority, pinned/always_on flag, or ST constant.
     enabledEntries.filter((e) => {
       const flags = e as unknown as Record<string, unknown>;
-      return (e.priority ?? 0) >= 8 || flags.always_on === true || flags.pinned === true;
+      const ext = (e.extensions ?? {}) as Record<string, unknown>;
+      return (e.priority ?? 0) >= 8 || flags.always_on === true || flags.pinned === true || ext.constant === true;
     }),
   );
   const dynamicEntries = sortEntriesForContext(
