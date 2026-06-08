@@ -46,6 +46,13 @@ export interface PreparedEntry {
   content: string;
   triggers: string[];
   priority: number;
+  enabled: boolean;
+  extensions: Record<string, unknown>;
+}
+
+export interface ImportedLorebook {
+  name: string;
+  entries: PreparedEntry[];
 }
 
 export interface PreparedImport {

@@ -14,7 +14,23 @@ describe("mapCharacterBook", () => {
       "Aria",
     );
     expect(out!.name).toBe("Lore");
-    expect(out!.entries[0]).toEqual({ title: "Dragons", content: "big lizard", triggers: ["dragon", "wyrm"], priority: -5 });
+    expect(out!.entries[0]).toEqual({
+      title: "Dragons",
+      content: "big lizard",
+      triggers: ["dragon", "wyrm"],
+      priority: -5,
+      enabled: true,
+      extensions: {
+        secondary_keys: [],
+        constant: false,
+        selective: false,
+        case_sensitive: false,
+        position: null,
+        scan_depth: null,
+        use_regex: false,
+        raw: out!.entries[0].extensions.raw,
+      },
+    });
     expect(out!.entries[1].priority).toBe(-1);
     expect(out!.entries[1].title).toBe("king"); // falls back to first key
   });
