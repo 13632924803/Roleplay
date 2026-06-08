@@ -187,6 +187,7 @@ export interface WorldbookEntryRow {
   token_estimate: number | null;
   last_triggered_at: string | null;
   trigger_count: number;
+  extensions?: Record<string, unknown>;
   deleted_at: string | null;
   deleted_reason: string | null;
   created_at: string;

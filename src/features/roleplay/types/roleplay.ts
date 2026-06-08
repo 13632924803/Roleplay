@@ -108,7 +108,7 @@ export type CreateWorldbookEntry = Pick<
   Partial<
     Pick<
       WorldbookEntryRow,
-      "category" | "triggers" | "priority" | "enabled" | "scope" | "token_estimate"
+      "category" | "triggers" | "priority" | "enabled" | "scope" | "token_estimate" | "extensions"
     >
   >;
 

@@ -370,6 +370,7 @@ export async function createWorldbookEntry(input: CreateWorldbookEntry): Promise
     token_estimate: input.token_estimate ?? null,
     last_triggered_at: null,
     trigger_count: 0,
+    extensions: input.extensions ?? {},
     deleted_at: null,
     deleted_reason: null,
     created_at: timestamp,
