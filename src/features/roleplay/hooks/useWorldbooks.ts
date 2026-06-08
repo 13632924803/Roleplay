@@ -4,6 +4,7 @@ import type { WorldbookRow, WorldbookEntryRow } from "../types/database";
 import * as Repo from "../repositories/roleplayRepository";
 import * as LocalRepo from "../repositories/localRoleplayRepository";
 import * as LocalMirror from "../repositories/localMirror";
+import type { PreparedEntry } from "../import/types";
 
 interface UseWorldbooksReturn {
   worldbooks: WorldbookRow[];
@@ -15,6 +16,7 @@ interface UseWorldbooksReturn {
   updateWb: (id: string, name: string, desc?: string, tags?: string[]) => Promise<void>;
   deleteWb: (id: string) => Promise<void>;
   createEntry: (wbId: string, title: string, content: string, triggers?: string[], priority?: number, category?: string) => Promise<void>;
+  importLorebook: (name: string, entries: PreparedEntry[]) => Promise<WorldbookRow | null>;
   updateEntry: (id: string, title: string, content: string, triggers?: string[], priority?: number, enabled?: boolean, category?: string) => Promise<void>;
   deleteEntry: (id: string) => Promise<void>;
   toggleEntryEnabled: (id: string, current: boolean) => Promise<void>;
@@ -102,6 +104,33 @@ export function useWorldbooks(userId: string | undefined, isDemo: boolean): UseW
     await loadEntries(wbId);
   }, [isDemo, userId, loadEntries]);
 
+  const importLorebook = useCallback(async (name: string, importedEntries: PreparedEntry[]) => {
+    const wb = isDemo || !supabase || !userId
+      ? await LocalRepo.createWorldbook({ name, tags: [] })
+      : await Repo.createWorldbook(supabase, userId, { name, tags: [] });
+    if (!wb) return null;
+    if (!isDemo && supabase && userId) LocalMirror.mirrorWorldbook(wb);
+    for (const e of importedEntries) {
+      const input = {
+        worldbook_id: wb.id,
+        title: e.title,
+        content: e.content,
+        triggers: e.triggers,
+        priority: e.priority,
+        enabled: e.enabled,
+        extensions: e.extensions,
+      };
+      if (isDemo || !supabase || !userId) {
+        await LocalRepo.createWorldbookEntry(input);
+      } else {
+        const row = await Repo.createWorldbookEntry(supabase, userId, input);
+        if (row) LocalMirror.mirrorWorldbookEntry(row);
+      }
+    }
+    setWorldbooks((prev) => [wb, ...prev]);
+    return wb;
+  }, [isDemo, userId]);
+
   const updateEntry = useCallback(async (id: string, title: string, content: string, triggers?: string[], priority?: number, enabled?: boolean, category?: string) => {
     if (isDemo || !supabase || !userId) {
       await LocalRepo.updateWorldbookEntry(id, { title, content, triggers: triggers ?? [], priority, enabled, category });
@@ -143,7 +172,7 @@ export function useWorldbooks(userId: string | undefined, isDemo: boolean): UseW
 
   return {
     worldbooks, entries, loading, activeWorldbookId, setActiveWorldbookId: (id) => { setActiveWorldbookId(id); if (id) loadEntries(id); else setEntries([]); },
-    createWb, updateWb, deleteWb, createEntry, updateEntry, deleteEntry, toggleEntryEnabled, refresh,
+    createWb, updateWb, deleteWb, createEntry, importLorebook, updateEntry, deleteEntry, toggleEntryEnabled, refresh,
     searchQuery, setSearchQuery, entrySearch, setEntrySearch,
     filteredWbs, filteredEntries,
   };
